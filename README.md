@@ -1,4 +1,4 @@
-# Test based on Godot Engine
+# Freedot based on Godot Engine
 
 <p align="center">
   <a href="https://godotengine.org">
@@ -8,7 +8,7 @@
 
 ## 2D and 3D cross-platform game engine
 
-**Test based on [Godot Engine](https://godotengine.org) is a feature-packed, cross-platform
+**Freedot based on [Godot Engine](https://godotengine.org) is a feature-packed, cross-platform
 game engine to create 2D and 3D games from a unified interface.** It provides a
 comprehensive set of [common tools](https://godotengine.org/features), so that
 users can focus on making games without having to reinvent the wheel. Games can
@@ -17,13 +17,11 @@ platforms (Linux, macOS, Windows), mobile platforms (Android, iOS), as well as
 Web-based platforms and [consoles](https://docs.godotengine.org/en/latest/tutorials/platform/consoles.html).
 
 ## Free, open source and community-driven
-
-Test based on Godot is completely free and open source under the very permissive [MIT license](https://godotengine.org/license).
+Freedot based on Godot is completely free and open source under the very permissive [MIT license](https://godotengine.org/license).
 No strings attached, no royalties, nothing. The users' games are theirs, down
-to the last line of engine code. Test's based on Godot development is fully independent and
+to the last line of engine code. Freedot's development is fully independent and
 community-driven, empowering users to help shape their engine to match their
-expectations. It is supported by the [Godot Foundation](https://godot.foundation/)
-not-for-profit.
+expectations
 
 Before being open sourced in [February 2014](https://github.com/godotengine/godot/commit/0b806ee0fc9097fa7bda7ac0109191c9c5e0a1ac),
 Godot had been developed by [Juan Linietsky](https://github.com/reduz) and
