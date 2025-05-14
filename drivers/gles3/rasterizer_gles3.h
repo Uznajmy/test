@@ -28,13 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RASTERIZER_GLES3_H
-#define RASTERIZER_GLES3_H
+#pragma once
 
 #ifdef GLES3_ENABLED
 
 #include "effects/copy_effects.h"
 #include "effects/cubemap_filter.h"
+#include "effects/feed_effects.h"
 #include "effects/glow.h"
 #include "effects/post_effects.h"
 #include "environment/fog.h"
@@ -78,6 +78,7 @@ protected:
 	GLES3::CubemapFilter *cubemap_filter = nullptr;
 	GLES3::Glow *glow = nullptr;
 	GLES3::PostEffects *post_effects = nullptr;
+	GLES3::FeedEffects *feed_effects = nullptr;
 	RasterizerCanvasGLES3 *canvas = nullptr;
 	RasterizerSceneGLES3 *scene = nullptr;
 	static RasterizerGLES3 *singleton;
@@ -103,6 +104,7 @@ public:
 
 	void blit_render_targets_to_screen(DisplayServer::WindowID p_screen, const BlitToScreen *p_render_targets, int p_amount);
 
+	bool is_opengl() { return true; }
 	void gl_end_frame(bool p_swap_buffers);
 	void end_frame(bool p_swap_buffers);
 
@@ -139,5 +141,3 @@ public:
 };
 
 #endif // GLES3_ENABLED
-
-#endif // RASTERIZER_GLES3_H

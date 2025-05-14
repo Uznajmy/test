@@ -30,6 +30,8 @@
 
 #include "egl_manager.h"
 
+#include "core/crypto/crypto_core.h"
+#include "core/io/dir_access.h"
 #include "drivers/gles3/rasterizer_gles3.h"
 
 #ifdef EGL_ENABLED
@@ -149,7 +151,7 @@ int EGLManager::_get_gldisplay_id(void *p_display) {
 String EGLManager::shader_cache_dir;
 
 void EGLManager::_set_cache(const void *p_key, EGLsizeiANDROID p_key_size, const void *p_value, EGLsizeiANDROID p_value_size) {
-	String name = CryptoCore::b64_encode_str((const uint8_t *)p_key, p_key_size).replace("/", "_");
+	String name = CryptoCore::b64_encode_str((const uint8_t *)p_key, p_key_size).replace_char('/', '_');
 	String path = shader_cache_dir.path_join(name) + ".cache";
 
 	Error err = OK;
@@ -161,7 +163,7 @@ void EGLManager::_set_cache(const void *p_key, EGLsizeiANDROID p_key_size, const
 }
 
 EGLsizeiANDROID EGLManager::_get_cache(const void *p_key, EGLsizeiANDROID p_key_size, void *p_value, EGLsizeiANDROID p_value_size) {
-	String name = CryptoCore::b64_encode_str((const uint8_t *)p_key, p_key_size).replace("/", "_");
+	String name = CryptoCore::b64_encode_str((const uint8_t *)p_key, p_key_size).replace_char('/', '_');
 	String path = shader_cache_dir.path_join(name) + ".cache";
 
 	Error err = OK;
@@ -412,6 +414,30 @@ EGLContext EGLManager::get_context(DisplayServer::WindowID p_window_id) {
 	GLDisplay &display = displays[glwindow.gldisplay_id];
 
 	return display.egl_context;
+}
+
+EGLDisplay EGLManager::get_display(DisplayServer::WindowID p_window_id) {
+	GLWindow &glwindow = windows[p_window_id];
+
+	if (!glwindow.initialized) {
+		return EGL_NO_CONTEXT;
+	}
+
+	GLDisplay &display = displays[glwindow.gldisplay_id];
+
+	return display.egl_display;
+}
+
+EGLConfig EGLManager::get_config(DisplayServer::WindowID p_window_id) {
+	GLWindow &glwindow = windows[p_window_id];
+
+	if (!glwindow.initialized) {
+		return nullptr;
+	}
+
+	GLDisplay &display = displays[glwindow.gldisplay_id];
+
+	return display.egl_config;
 }
 
 Error EGLManager::initialize(void *p_native_display) {

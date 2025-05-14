@@ -90,7 +90,7 @@ android {
         jvmTarget = versions.javaVersion
     }
 
-    assetPacks = [":assetPacks:installTime"]
+    assetPacks = [":assetPacksInstallTime"]
 
     namespace = 'com.godot.game'
 
@@ -101,11 +101,10 @@ android {
         }
 
         ndk {
+            debugSymbolLevel 'FULL'
             String[] export_abi_list = getExportEnabledABIs()
             abiFilters export_abi_list
         }
-
-        manifestPlaceholders = [godotEditorVersion: getGodotEditorVersion()]
 
         // Feel free to modify the application id to your own.
         applicationId getExportPackageName()
@@ -253,7 +252,7 @@ task copyAndRenameBinary(type: Copy) {
 
     boolean isAab = exportFormat == "aab"
     boolean isMono = exportEdition == "mono"
-    String filenameSuffix = exportBuildType
+    String filenameSuffix = isAab ? "${exportEdition}-${exportBuildType}" : exportBuildType
     if (isMono) {
         filenameSuffix = isAab ? "${exportEdition}-${exportBuildType}" : "${exportEdition}${exportBuildTypeCapitalized}"
     }

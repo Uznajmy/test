@@ -169,7 +169,7 @@ uint64_t PluginConfigIOS::get_plugin_modification_time(const PluginConfigIOS &pl
 PluginConfigIOS PluginConfigIOS::load_plugin_config(Ref<ConfigFile> config_file, const String &path) {
 	PluginConfigIOS plugin_config = {};
 
-	if (!config_file.is_valid()) {
+	if (config_file.is_null()) {
 		return plugin_config;
 	}
 
@@ -209,8 +209,7 @@ PluginConfigIOS PluginConfigIOS::load_plugin_config(Ref<ConfigFile> config_file,
 	}
 
 	if (config_file->has_section(PluginConfigIOS::PLIST_SECTION)) {
-		List<String> keys;
-		config_file->get_section_keys(PluginConfigIOS::PLIST_SECTION, &keys);
+		Vector<String> keys = config_file->get_section_keys(PluginConfigIOS::PLIST_SECTION);
 
 		for (const String &key : keys) {
 			Vector<String> key_components = key.split(":");

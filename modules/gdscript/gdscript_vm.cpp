@@ -387,7 +387,7 @@ void (*type_init_function_table[])(Variant *) = {
 		&&OPCODE_LINE,                                   \
 		&&OPCODE_END                                     \
 	};                                                   \
-	static_assert((sizeof(switch_table_ops) / sizeof(switch_table_ops[0]) == (OPCODE_END + 1)), "Opcodes in jump table aren't the same as opcodes in enum.");
+	static_assert(std::size(switch_table_ops) == (OPCODE_END + 1), "Opcodes in jump table aren't the same as opcodes in enum.");
 
 #define OPCODE(m_op) \
 	m_op:
@@ -397,32 +397,36 @@ void (*type_init_function_table[])(Variant *) = {
 #define OPCODES_OUT \
 	OPSOUT:
 #define OPCODE_SWITCH(m_test) goto *switch_table_ops[m_test];
+
 #ifdef DEBUG_ENABLED
 #define DISPATCH_OPCODE          \
 	last_opcode = _code_ptr[ip]; \
 	goto *switch_table_ops[last_opcode]
-#else
+#else // !DEBUG_ENABLED
 #define DISPATCH_OPCODE goto *switch_table_ops[_code_ptr[ip]]
-#endif
+#endif // DEBUG_ENABLED
+
 #define OPCODE_BREAK goto OPSEXIT
 #define OPCODE_OUT goto OPSOUT
-#else
+#else // !(defined(__GNUC__) || defined(__clang__))
 #define OPCODES_TABLE
 #define OPCODE(m_op) case m_op:
 #define OPCODE_WHILE(m_test) while (m_test)
 #define OPCODES_END
 #define OPCODES_OUT
 #define DISPATCH_OPCODE continue
+
 #ifdef _MSC_VER
 #define OPCODE_SWITCH(m_test)       \
 	__assume(m_test <= OPCODE_END); \
 	switch (m_test)
-#else
+#else // !_MSC_VER
 #define OPCODE_SWITCH(m_test) switch (m_test)
-#endif
+#endif // _MSC_VER
+
 #define OPCODE_BREAK break
 #define OPCODE_OUT break
-#endif
+#endif // defined(__GNUC__) || defined(__clang__)
 
 // Helpers for VariantInternal methods in macros.
 #define OP_GET_BOOL get_bool
@@ -506,12 +510,6 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 	Variant *stack = nullptr;
 	Variant **instruction_args = nullptr;
 	int defarg = 0;
-
-#ifdef DEBUG_ENABLED
-
-	//GDScriptLanguage::get_singleton()->calls++;
-
-#endif
 
 	uint32_t alloca_size = 0;
 	GDScript *script;
@@ -623,12 +621,9 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 
 	String err_text;
 
+	GDScriptLanguage::get_singleton()->enter_function(p_instance, this, stack, &ip, &line);
+
 #ifdef DEBUG_ENABLED
-
-	if (EngineDebugger::is_active()) {
-		GDScriptLanguage::get_singleton()->enter_function(p_instance, this, stack, &ip, &line);
-	}
-
 #define GD_ERR_BREAK(m_cond)                                                                                           \
 	{                                                                                                                  \
 		if (unlikely(m_cond)) {                                                                                        \
@@ -663,7 +658,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 			OPCODE_BREAK;                                                                           \
 	}
 
-#else
+#else // !DEBUG_ENABLED
 #define GD_ERR_BREAK(m_cond)
 #define CHECK_SPACE(m_space)
 
@@ -676,7 +671,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 			OPCODE_BREAK;                                                                       \
 	}
 
-#endif
+#endif // DEBUG_ENABLED
 
 #define LOAD_INSTRUCTION_ARGS                   \
 	int instr_arg_count = _code_ptr[ip + 1];    \
@@ -700,10 +695,10 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 		profile.frame_call_count.increment();
 	}
 	bool exit_ok = false;
-	bool awaited = false;
 	int variant_address_limits[ADDR_TYPE_MAX] = { _stack_size, _constant_count, p_instance ? (int)p_instance->members.size() : 0 };
 #endif
 
+	bool awaited = false;
 	Variant *variant_addresses[ADDR_TYPE_MAX] = { stack, _constants_ptr, p_instance ? p_instance->members.ptrw() : nullptr };
 
 #ifdef DEBUG_ENABLED
@@ -1965,7 +1960,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 					err_text = _get_call_error("function '" + methodstr + (is_callable ? "" : "' in base '" + basestr) + "'", (const Variant **)argptrs, temp_ret, err);
 					OPCODE_BREAK;
 				}
-#endif
+#endif // DEBUG_ENABLED
 
 				ip += 3;
 			}
@@ -2540,7 +2535,6 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 						memnew_placement(&gdfs->state.stack.write[sizeof(Variant) * i], Variant(stack[i]));
 					}
 					gdfs->state.stack_size = _stack_size;
-					gdfs->state.alloca_size = alloca_size;
 					gdfs->state.ip = ip + 2;
 					gdfs->state.line = line;
 					gdfs->state.script = _script;
@@ -2569,9 +2563,10 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 						OPCODE_BREAK;
 					}
 
+					awaited = true;
+
 #ifdef DEBUG_ENABLED
 					exit_ok = true;
-					awaited = true;
 #endif
 					OPCODE_BREAK;
 				}
@@ -3248,7 +3243,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 			ip += 5;                                                                                                       \
 		} else {                                                                                                           \
 			int jumpto = _code_ptr[ip + 4];                                                                                \
-			GD_ERR_BREAK(jumpto<0 || jumpto> _code_size);                                                                  \
+			GD_ERR_BREAK(jumpto < 0 || jumpto > _code_size);                                                               \
 			ip = jumpto;                                                                                                   \
 		}                                                                                                                  \
 	}                                                                                                                      \
@@ -3286,9 +3281,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 #endif
 
 				*counter = Variant();
-
-				Array ref;
-				ref.push_back(*counter);
+				Array ref = { *counter };
 				Variant vref;
 				VariantInternal::initialize(&vref, Variant::ARRAY);
 				*VariantInternal::get_array(&vref) = ref;
@@ -3580,7 +3573,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 		(*idx)++;                                                                                   \
 		if (*idx >= array->size()) {                                                                \
 			int jumpto = _code_ptr[ip + 4];                                                         \
-			GD_ERR_BREAK(jumpto<0 || jumpto> _code_size);                                           \
+			GD_ERR_BREAK(jumpto < 0 || jumpto > _code_size);                                        \
 			ip = jumpto;                                                                            \
 		} else {                                                                                    \
 			GET_VARIANT_PTR(iterator, 2);                                                           \
@@ -3621,8 +3614,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				Object *obj = *VariantInternal::get_object(container);
 #endif
 
-				Array ref;
-				ref.push_back(*counter);
+				Array ref = { *counter };
 				Variant vref;
 				VariantInternal::initialize(&vref, Variant::ARRAY);
 				*VariantInternal::get_array(&vref) = ref;
@@ -3870,23 +3862,19 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 			GDScriptLanguage::get_singleton()->script_frame_time += time_taken - function_call_time;
 		}
 	}
+#endif
 
 	// Check if this is not the last time it was interrupted by `await` or if it's the first time executing.
 	// If that is the case then we exit the function as normal. Otherwise we postpone it until the last `await` is completed.
 	// This ensures the call stack can be properly shown when using `await`, showing what resumed the function.
 	if (!p_state || awaited) {
-		if (EngineDebugger::is_active()) {
-			GDScriptLanguage::get_singleton()->exit_function();
-		}
-#endif
+		GDScriptLanguage::get_singleton()->exit_function();
 
 		// Free stack, except reserved addresses.
 		for (int i = FIXED_ADDRESSES_MAX; i < _stack_size; i++) {
 			stack[i].~Variant();
 		}
-#ifdef DEBUG_ENABLED
 	}
-#endif
 
 	// Always free reserved addresses, since they are never copied.
 	for (int i = 0; i < FIXED_ADDRESSES_MAX; i++) {
