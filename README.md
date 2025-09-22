@@ -1,14 +1,14 @@
-# Freedot based on Godot Engine
+# None Engine based on Godot Engine
 
 <p align="center">
   <a href="https://godotengine.org">
-    <img src="logo_outlined.svg" width="400" alt="Godot Engine logo">
+    <img src="none_game_engine.svg" width="400" alt="Godot Engine logo">
   </a>
 </p>
 
 ## 2D and 3D cross-platform game engine
 
-**Freedot based on [Godot Engine](https://godotengine.org) is a feature-packed, cross-platform
+**None Engine based on [Godot Engine](https://godotengine.org) is a feature-packed, cross-platform
 game engine to create 2D and 3D games from a unified interface.** It provides a
 comprehensive set of [common tools](https://godotengine.org/features), so that
 users can focus on making games without having to reinvent the wheel. Games can
@@ -17,9 +17,9 @@ platforms (Linux, macOS, Windows), mobile platforms (Android, iOS), as well as
 Web-based platforms and [consoles](https://docs.godotengine.org/en/latest/tutorials/platform/consoles.html).
 
 ## Free, open source and community-driven
-Freedot based on Godot is completely free and open source under the very permissive [MIT license](https://godotengine.org/license).
+None Engine, just like Godot Engine, is completely free and open source under the very permissive [MIT license](https://godotengine.org/license).
 No strings attached, no royalties, nothing. The users' games are theirs, down
-to the last line of engine code. Freedot's development is fully independent and
+to the last line of engine code. None Engine's development is fully independent and
 community-driven, empowering users to help shape their engine to match their
 expectations
 
@@ -45,7 +45,7 @@ for compilation instructions for every supported platform.
 
 ## Community and contributing
 
-Godot is not only an engine but an ever-growing community of users and engine
+None Engine is not only an engine but an ever-growing community of users and engine
 developers. The main community channels are listed [on the homepage](https://godotengine.org/community).
 
 The best way to get in touch with the core engine developers is to join the
@@ -57,13 +57,11 @@ This document also includes guidelines for reporting bugs.
 ## Documentation and demos
 
 The official documentation is hosted on [Read the Docs](https://docs.godotengine.org).
-It is maintained by the Godot community in its own [GitHub repository](https://github.com/godotengine/godot-docs).
+It is maintained by the None community in its own [GitHub repository](https://github.com/godotengine/godot-docs).
 
 The [class reference](https://docs.godotengine.org/en/latest/classes/)
-is also accessible from the Godot editor.
+is also accessible from the None editor.
 
-We also maintain official demos in their own [GitHub repository](https://github.com/godotengine/godot-demo-projects)
-as well as a list of [awesome Godot community resources](https://github.com/godotengine/awesome-godot).
 
 There are also a number of other
 [learning resources](https://docs.godotengine.org/en/latest/community/tutorials.html)
