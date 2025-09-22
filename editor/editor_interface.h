@@ -132,6 +132,11 @@ public:
 
 	float get_editor_scale() const;
 
+	bool is_node_3d_snap_enabled() const;
+	real_t get_node_3d_translate_snap() const;
+	real_t get_node_3d_rotate_snap() const;
+	real_t get_node_3d_scale_snap() const;
+
 	void popup_dialog(Window *p_dialog, const Rect2i &p_screen_rect = Rect2i());
 	void popup_dialog_centered(Window *p_dialog, const Size2i &p_minsize = Size2i());
 	void popup_dialog_centered_ratio(Window *p_dialog, float p_ratio = 0.8);
@@ -177,6 +182,7 @@ public:
 	void save_scene_as(const String &p_scene, bool p_with_preview = true);
 	void mark_scene_as_unsaved();
 	void save_all_scenes();
+	Error close_scene();
 
 	// Scene playback.
 

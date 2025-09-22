@@ -33,16 +33,16 @@
 #include "core/input/input.h"
 #include "core/math/expression.h"
 #include "core/os/keyboard.h"
-#include "editor/editor_settings.h"
+#include "editor/settings/editor_settings.h"
 #include "editor/themes/editor_scale.h"
 #include "scene/theme/theme_db.h"
 
 String EditorSpinSlider::get_tooltip(const Point2 &p_pos) const {
 	if (!read_only && grabber->is_visible()) {
 		Key key = (OS::get_singleton()->has_feature("macos") || OS::get_singleton()->has_feature("web_macos") || OS::get_singleton()->has_feature("web_ios")) ? Key::META : Key::CTRL;
-		return TS->format_number(rtos(get_value())) + "\n\n" + vformat(TTR("Hold %s to round to integers.\nHold Shift for more precise changes."), find_keycode_name(key));
+		return TS->format_number(rtos(get_value())) + suffix + "\n\n" + vformat(TTR("Hold %s to round to integers.\nHold Shift for more precise changes."), find_keycode_name(key));
 	}
-	return TS->format_number(rtos(get_value()));
+	return TS->format_number(rtos(get_value())) + suffix;
 }
 
 String EditorSpinSlider::get_text_value() const {
@@ -453,7 +453,7 @@ void EditorSpinSlider::_draw_spin_slider() {
 void EditorSpinSlider::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
-			grabbing_spinner_speed = EditorSettings::get_singleton()->get("interface/inspector/float_drag_speed");
+			grabbing_spinner_speed = EDITOR_GET("interface/inspector/float_drag_speed");
 			_update_value_input_stylebox();
 		} break;
 
